@@ -22,7 +22,10 @@ I pulled the Jasmine (4.6.0) files from: https://cdnjs.com/libraries/jasmine
 * jasmine.js
 * boot0.js
 * boot1.js
- 
+
+These files are located in `src/main/resources`.
+The test is located in `src/test/resources`.
+
 ## jasmine.js
 You will notice I have commented out some lines in this file.  
 I put a "TODO: PVM:" by the comment to signify that I commented this part of the file.
@@ -37,3 +40,6 @@ If the tests are not, then it skips using Browser, or Node.js, specific function
 ## boot1.js
 You will notice that most of this file is commented out.  This is because this file assumes that the tests are
 Browser, or Node.js, based.  
+
+## JasmineRunner
+This Java class is used to build the GraalVM environment with Jasmine and then executes the tests.

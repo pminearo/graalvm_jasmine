@@ -5,9 +5,10 @@ import static org.assertj.core.api.Assertions.*;
 import java.io.File;
 
 import org.graalvm.polyglot.Value;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public class JasmineRunnerIT {
+public class JasmineRunnerTest {
 
     @Test
     public void testRun() throws Exception {
@@ -45,9 +46,9 @@ public class JasmineRunnerIT {
         System.out.println("Status: " + status);
         System.out.println("Jasmine Started:" + jasmineStarted);
         System.out.println("Jasmine Done:" + jasmineDone);
-        System.out.println("Suite Started:" + suiteStarted);
-        System.out.println("Suite Done:" + suiteDone);
-        System.out.println("Suite Results:" + suiteResults);
+//        System.out.println("Suite Started:" + suiteStarted);
+//        System.out.println("Suite Done:" + suiteDone);
+//        System.out.println("Suite Results:" + suiteResults);
         System.out.println("Suites: " + suites);
         System.out.println("Specs Done:" + specDone);
         System.out.println("Spec Results:" + specResults);
@@ -59,10 +60,17 @@ public class JasmineRunnerIT {
     }
 
     /*
-     * The Tests below were used to ensure each method worked before executing a test.
+     * The Tests below were used to ensure each method worked before executing a `testRun()`.
+     *
+     * These Tests are disabled because we only want `testRun()` to execute when
+     * building the project. This test calls all of the methods in the tests below.
+     *
+     * Remove `@Disabled` if you want to execute any of the tests specifically.
+     *
      */
 
     @Test
+    @Disabled
     public void testInitializeJasmine() throws Exception {
 
         final JasmineRunner scriptRunner = new JasmineRunner();
@@ -72,6 +80,7 @@ public class JasmineRunnerIT {
     }
 
     @Test
+    @Disabled
     public void testLoadTest() throws Exception {
 
         final JasmineRunner scriptRunner = new JasmineRunner();
@@ -85,6 +94,7 @@ public class JasmineRunnerIT {
     }
 
     @Test
+    @Disabled
     public void testLoadJasmineBoot1() throws Exception {
 
         final JasmineRunner scriptRunner = new JasmineRunner();
@@ -97,6 +107,7 @@ public class JasmineRunnerIT {
     }
 
     @Test
+    @Disabled
     public void testLoadJasmineBoot0() throws Exception {
 
         final JasmineRunner scriptRunner = new JasmineRunner();
@@ -108,6 +119,7 @@ public class JasmineRunnerIT {
     }
 
     @Test
+    @Disabled
     public void testLoadJasmine() throws Exception {
 
         final JasmineRunner scriptRunner = new JasmineRunner();
@@ -132,6 +144,7 @@ public class JasmineRunnerIT {
     }
 
     @Test
+    @Disabled
     public void testCreateGlobalVariables() {
 
         final JasmineRunner scriptRunner = new JasmineRunner();
@@ -144,6 +157,7 @@ public class JasmineRunnerIT {
     }
 
     @Test
+    @Disabled
     public void testFindFile() {
 
         final JasmineRunner scriptRunner = new JasmineRunner();

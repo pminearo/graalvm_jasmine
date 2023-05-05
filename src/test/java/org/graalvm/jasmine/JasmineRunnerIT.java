@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.io.File;
 
-import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 import org.junit.jupiter.api.Test;
 
@@ -58,6 +57,10 @@ public class JasmineRunnerIT {
         System.out.println("########################");
         System.out.println("########################");
     }
+
+    /*
+     * The Tests below were used to ensure each method worked before executing a test.
+     */
 
     @Test
     public void testInitializeJasmine() throws Exception {

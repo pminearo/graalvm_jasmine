@@ -35,6 +35,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function() {
   const env = jasmine.getEnv();
+  env.addReporter(jsApiReporter);
+
+  //TODO: PVM: Commented everything else because this assumes the tests are Browser, or Node.js, based.
 
   /**
    * ## Runner Parameters
@@ -97,7 +100,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   /**
    * The `jsApiReporter` also receives spec results, and is used by any environment that needs to extract the results  from JavaScript.
    */
-  env.addReporter(jsApiReporter);
+
   // env.addReporter(htmlReporter);
 
   /**

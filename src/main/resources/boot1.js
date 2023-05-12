@@ -37,7 +37,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   const env = jasmine.getEnv();
   env.addReporter(jsApiReporter);
 
-  //TODO: PVM: Commented everything else because this assumes the tests are Browser, or Node.js, based.
+  //TODO: GRAALVM: Commented everything else because this assumes the tests are Browser, or Node.js, based.
 
   /**
    * ## Runner Parameters

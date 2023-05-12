@@ -28,7 +28,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 (function() {
 
-  // TODO: PVM: This should look to see if `jasmineRequire` already exists.
+  // TODO: GRAALVM: This should look to see if `jasmineRequire` already exists.
   //       Also, this should check to see if `window` or `require` exits.
   //       Do not automatically assume they do.
   if (typeof jasmineRequire === 'undefined') {
@@ -57,7 +57,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
   /**
    * Since this is being run in a browser and the results should populate to an HTML page, require the HTML-specific Jasmine code, injecting the same reference.
    */
-  // TODO: PVM: This should check to see if the tests are Browser, or Node based.
+  // TODO: GRAALVM: This should check to see if the tests are Browser, or Node based.
   if (typeof window !== 'undefined' || typeof require === 'function') {
     jasmineRequire.html(jasmine);
   }

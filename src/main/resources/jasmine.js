@@ -24,25 +24,28 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 var getJasmineRequireObj = (function(jasmineGlobal) {
   let jasmineRequire;
 
-  if (
-    typeof module !== 'undefined' &&
-    module.exports &&
-    typeof exports !== 'undefined'
-  ) {
+  // Do not add `module`, `module.exports`, and `exports` to the global scope
+  // Unless the JasmineRequire object has already been created
+  // And is assigned to the global 'exports' variable
+  if (typeof module !== 'undefined' && module.exports && typeof exports !== 'undefined') {
+
     if (typeof global !== 'undefined') {
       jasmineGlobal = global;
     } else {
       jasmineGlobal = {};
     }
+
     jasmineRequire = exports;
   } else {
-    if (
-      typeof window !== 'undefined' &&
-      typeof window.toString === 'function' &&
-      window.toString() === '[object GjsGlobal]'
-    ) {
-      jasmineGlobal = window;
-    }
+    // TODO: GRAALVM: Removing Browser Code
+    // if (
+    //   typeof window !== 'undefined' &&
+    //   typeof window.toString === 'function' &&
+    //   window.toString() === '[object GjsGlobal]'
+    // ) {
+    //   jasmineGlobal = window;
+    // }
+
     jasmineRequire = jasmineGlobal.jasmineRequire = {};
   }
 
@@ -310,13 +313,17 @@ getJasmineRequireObj().base = function(j$, jasmineGlobal) {
   };
 
   j$.isDomNode = function(obj) {
+    // We will never have a DOM Node
+    return false;
+
+    // TODO: GRAALVM: Removing Browser reference
     // Node is a function, because constructors
-    return typeof jasmineGlobal.Node !== 'undefined'
-      ? obj instanceof jasmineGlobal.Node
-      : obj !== null &&
-          typeof obj === 'object' &&
-          typeof obj.nodeType === 'number' &&
-          typeof obj.nodeName === 'string';
+    // return typeof jasmineGlobal.Node !== 'undefined'
+    //   ? obj instanceof jasmineGlobal.Node
+    //   : obj !== null &&
+    //       typeof obj === 'object' &&
+    //       typeof obj.nodeType === 'number' &&
+    //       typeof obj.nodeName === 'string';
     // return obj.nodeType > 0;
   };
 
@@ -790,7 +797,7 @@ getJasmineRequireObj().Spec = function(j$) {
       } else {
         this.result.failedExpectations.push(expectationResult);
 
-        // TODO: refactor so that we don't need to override cached status
+        // TODO: JASMINE: refactor so that we don't need to override cached status
         if (this.result.status) {
           this.result.status = 'failed';
         }
@@ -1394,7 +1401,7 @@ getJasmineRequireObj().Env = function(j$) {
       }
     };
 
-    // TODO: Unify recordLateError with recordLateExpectation? The extra
+    // TODO: JASMINE: Unify recordLateError with recordLateExpectation? The extra
     // diagnostic info added by the latter is probably useful in most cases.
     function recordLateError(error) {
       const isExpectationResult =
@@ -1668,13 +1675,16 @@ getJasmineRequireObj().Env = function(j$) {
     this.execute = function(runablesToRun, onComplete) {
       installGlobalErrors();
 
-      return runner.execute(runablesToRun).then(function(jasmineDoneInfo) {
+      // TODO: GRAALVM: Moved "then" to next line.
+      return runner.execute(runablesToRun).
+      then(function(jasmineDoneInfo) {
         if (onComplete) {
           onComplete();
         }
 
         return jasmineDoneInfo;
-      });
+      }).
+      catch(function(reason) { throw new Error("Runner Execute failed: " + reason);});
     };
 
     /**
@@ -1960,7 +1970,8 @@ getJasmineRequireObj().Env = function(j$) {
       if (message) {
         fullMessage += message;
       }
-      throw fullMessage;
+      // TODO: GRAALVM: Wrapped message in Object
+      throw new Error(fullMessage);
     };
 
     this.fail = function(error) {
@@ -2573,7 +2584,7 @@ getJasmineRequireObj().Truthy = function(j$) {
   return Truthy;
 };
 
-//TODO: expectation result may make more sense as a presentation of an expectation.
+//TODO: JASMINE: expectation result may make more sense as a presentation of an expectation.
 getJasmineRequireObj().buildExpectationResult = function(j$) {
   function buildExpectationResult(options) {
     const exceptionFormatter = new j$.ExceptionFormatter();
@@ -2857,44 +2868,49 @@ getJasmineRequireObj().clearStack = function(j$) {
   }
 
   function getClearStack(global) {
-    const NODE_JS =
-      global.process &&
-      global.process.versions &&
-      typeof global.process.versions.node === 'string';
 
-    const SAFARI =
-      global.navigator &&
-      /^((?!chrome|android).)*safari/i.test(global.navigator.userAgent);
+    // return nodeQueueMicrotaskImpl(global);
 
-    if (NODE_JS) {
-      // Unlike browsers, Node doesn't require us to do a periodic setTimeout
-      // so we avoid the overhead.
-      return nodeQueueMicrotaskImpl(global);
-    } else if (
-      SAFARI ||
-      j$.util.isUndefined(global.MessageChannel) /* tests */
-    ) {
-      // queueMicrotask is dramatically faster than MessageChannel in Safari,
-      // at least through version 16.
-      // Some of our own integration tests provide a mock queueMicrotask in all
-      // environments because it's simpler to mock than MessageChannel.
-      return browserQueueMicrotaskImpl(global);
-    } else {
-      // MessageChannel is faster than queueMicrotask in supported browsers
-      // other than Safari.
-      return messageChannelImpl(global);
-    }
+    // TODO: GRAALVM: Removing Browser and Node JS reference
+    // const NODE_JS =
+    //   global.process &&
+    //   global.process.versions &&
+    //   typeof global.process.versions.node === 'string';
+    //
+    // const SAFARI =
+    //   global.navigator &&
+    //   /^((?!chrome|android).)*safari/i.test(global.navigator.userAgent);
+    //
+    // if (NODE_JS) {
+    //   // Unlike browsers, Node doesn't require us to do a periodic setTimeout
+    //   // so we avoid the overhead.
+    //   return nodeQueueMicrotaskImpl(global);
+    // } else if (
+    //   SAFARI ||
+    //   j$.util.isUndefined(global.MessageChannel) /* tests */
+    // ) {
+    //   // queueMicrotask is dramatically faster than MessageChannel in Safari,
+    //   // at least through version 16.
+    //   // Some of our own integration tests provide a mock queueMicrotask in all
+    //   // environments because it's simpler to mock than MessageChannel.
+    //   return browserQueueMicrotaskImpl(global);
+    // } else {
+    //   // MessageChannel is faster than queueMicrotask in supported browsers
+    //   // other than Safari.
+    //   return messageChannelImpl(global);
+    // }
   }
 
   return getClearStack;
 };
 
 getJasmineRequireObj().Clock = function() {
+  // TODO: GRAALVM: Removing Browser and Node JS reference
   /* global process */
-  const NODE_JS =
-    typeof process !== 'undefined' &&
-    process.versions &&
-    typeof process.versions.node === 'string';
+  // const NODE_JS =
+  //   typeof process !== 'undefined' &&
+  //   process.versions &&
+  //   typeof process.versions.node === 'string';
 
   /**
    * @class Clock
@@ -3047,13 +3063,15 @@ getJasmineRequireObj().Clock = function() {
     }
 
     function setTimeout(fn, delay) {
-      if (!NODE_JS) {
-        return delayedFunctionScheduler.scheduleFunction(
-          fn,
-          delay,
-          argSlice(arguments, 2)
-        );
-      }
+
+      // TODO: GRAALVM: Removing Browser and Node JS reference
+      // if (!NODE_JS) {
+      //   return delayedFunctionScheduler.scheduleFunction(
+      //     fn,
+      //     delay,
+      //     argSlice(arguments, 2)
+      //   );
+      // }
 
       const timeout = new FakeTimeout();
 
@@ -3073,14 +3091,16 @@ getJasmineRequireObj().Clock = function() {
     }
 
     function setInterval(fn, interval) {
-      if (!NODE_JS) {
-        return delayedFunctionScheduler.scheduleFunction(
-          fn,
-          interval,
-          argSlice(arguments, 2),
-          true
-        );
-      }
+
+      // TODO: GRAALVM: Removing Browser and Node JS reference
+      // if (!NODE_JS) {
+      //   return delayedFunctionScheduler.scheduleFunction(
+      //     fn,
+      //     interval,
+      //     argSlice(arguments, 2),
+      //     true
+      //   );
+      // }
 
       const timeout = new FakeTimeout();
 
@@ -3978,7 +3998,7 @@ getJasmineRequireObj().Expector = function(j$) {
       error: errorForStack ? undefined : result.error,
       errorForStack: errorForStack || undefined,
       actual: this.actual,
-      expected: this.expected // TODO: this may need to be arrayified/sliced
+      expected: this.expected // TODO: JASMINE: this may need to be arrayified/sliced
     });
   };
 
@@ -4096,7 +4116,7 @@ getJasmineRequireObj().GlobalErrors = function(j$) {
         const originalHandler = global.onerror;
         global.onerror = onerror;
 
-        // TODO: PVM: Comment this out for Non-Browser, or Non-Node environments.
+        // TODO: GRAALVM: Removing Browser and Node JS reference
         // const browserRejectionHandler = function browserRejectionHandler(
         //   event
         // ) {
@@ -4108,13 +4128,13 @@ getJasmineRequireObj().GlobalErrors = function(j$) {
         //     global.onerror('Unhandled promise rejection: ' + event.reason);
         //   }
         // };
-        // TODO: PVM: Comment this out for Non-Browser, or Non-Node environments.
+        // TODO: GRAALVM: Removing Browser and Node JS reference
         // global.addEventListener('unhandledrejection', browserRejectionHandler);
 
         this.uninstall = function uninstall() {
           global.onerror = originalHandler;
           global.removeEventListener('unhandledrejection');
-          // TODO: PVM: Comment this out for Non-Browser, or Non-Node environments.
+          // TODO: GRAALVM: Removing Browser and Node JS reference
           // global.removeEventListener(
           //   'unhandledrejection',
           //   browserRejectionHandler
@@ -4893,20 +4913,21 @@ getJasmineRequireObj().MatchersUtil = function(j$) {
       return false;
     }
 
-    const aIsDomNode = j$.isDomNode(a);
-    const bIsDomNode = j$.isDomNode(b);
-    if (aIsDomNode && bIsDomNode) {
-      // At first try to use DOM3 method isEqualNode
-      result = a.isEqualNode(b);
-      if (!result) {
-        diffBuilder.recordMismatch();
-      }
-      return result;
-    }
-    if (aIsDomNode || bIsDomNode) {
-      diffBuilder.recordMismatch();
-      return false;
-    }
+    // TODO: GRAALVM: Removing Browser reference
+    // const aIsDomNode = j$.isDomNode(a);
+    // const bIsDomNode = j$.isDomNode(b);
+    // if (aIsDomNode && bIsDomNode) {
+    //   // At first try to use DOM3 method isEqualNode
+    //   result = a.isEqualNode(b);
+    //   if (!result) {
+    //     diffBuilder.recordMismatch();
+    //   }
+    //   return result;
+    // }
+    // if (aIsDomNode || bIsDomNode) {
+    //   diffBuilder.recordMismatch();
+    //   return false;
+    // }
 
     const aIsPromise = j$.isPromise(a);
     const bIsPromise = j$.isPromise(b);
@@ -5991,7 +6012,7 @@ getJasmineRequireObj().toEqual = function(j$) {
 
         result.pass = matchersUtil.equals(actual, expected, diffBuilder);
 
-        // TODO: only set error message if test fails
+        // TODO: JASMINE: only set error message if test fails
         result.message = diffBuilder.getMessage();
 
         return result;
@@ -6409,6 +6430,7 @@ getJasmineRequireObj().toHaveBeenCalledWith = function(j$) {
   return toHaveBeenCalledWith;
 };
 
+// TODO: GRAALVM: This is for DOM Elements. Leaving in, but disabling it.
 getJasmineRequireObj().toHaveClass = function(j$) {
   /**
    * {@link expect} the actual value to be a DOM element that has the expected class
@@ -6424,21 +6446,24 @@ getJasmineRequireObj().toHaveClass = function(j$) {
   function toHaveClass(matchersUtil) {
     return {
       compare: function(actual, expected) {
-        if (!isElement(actual)) {
-          throw new Error(matchersUtil.pp(actual) + ' is not a DOM element');
-        }
+        return { pass: false};
 
-        return {
-          pass: actual.classList.contains(expected)
-        };
+        // if (isElement(actual)) {
+        //   throw new Error(matchersUtil.pp(actual) + ' is not a DOM element');
+        // }
+        //
+        // return {
+        //   pass: actual.classList.contains(expected)
+        // };
       }
     };
   }
 
   function isElement(maybeEl) {
-    return (
-      maybeEl && maybeEl.classList && j$.isFunction_(maybeEl.classList.contains)
-    );
+    return false;
+    // return (
+    //   maybeEl && maybeEl.classList && j$.isFunction_(maybeEl.classList.contains)
+    // );
   }
 
   return toHaveClass;
@@ -7130,12 +7155,15 @@ getJasmineRequireObj().makePrettyPrinter = function(j$) {
           this.emitScalar(value.toString());
         } else if (typeof value === 'function') {
           this.emitScalar('Function');
-        } else if (j$.isDomNode(value)) {
-          if (value.tagName) {
-            this.emitDomElement(value);
-          } else {
-            this.emitScalar('HTMLNode');
-          }
+
+        // TODO: GRAALVM: Removing Browser and Node reference
+        // } else if (j$.isDomNode(value)) {
+        //   if (value.tagName) {
+        //     this.emitDomElement(value);
+        //   } else {
+        //     this.emitScalar('HTMLNode');
+        //   }
+
         } else if (value instanceof Date) {
           this.emitScalar('Date(' + value + ')');
         } else if (j$.isSet(value)) {
@@ -7340,26 +7368,27 @@ getJasmineRequireObj().makePrettyPrinter = function(j$) {
       this.append(constructorName + ' [ ' + itemsString + ' ]');
     }
 
-    emitDomElement(el) {
-      const tagName = el.tagName.toLowerCase();
-      let out = '<' + tagName;
-
-      for (const attr of el.attributes) {
-        out += ' ' + attr.name;
-
-        if (attr.value !== '') {
-          out += '="' + attr.value + '"';
-        }
-      }
-
-      out += '>';
-
-      if (el.childElementCount !== 0 || el.textContent !== '') {
-        out += '...</' + tagName + '>';
-      }
-
-      this.append(out);
-    }
+    // TODO: GRAALVM: Removing Browser reference
+    // emitDomElement(el) {
+    //   const tagName = el.tagName.toLowerCase();
+    //   let out = '<' + tagName;
+    //
+    //   for (const attr of el.attributes) {
+    //     out += ' ' + attr.name;
+    //
+    //     if (attr.value !== '') {
+    //       out += '="' + attr.value + '"';
+    //     }
+    //   }
+    //
+    //   out += '>';
+    //
+    //   if (el.childElementCount !== 0 || el.textContent !== '') {
+    //     out += '...</' + tagName + '>';
+    //   }
+    //
+    //   this.append(out);
+    // }
 
     formatProperty(obj, property) {
       if (typeof property === 'symbol') {
@@ -7514,7 +7543,7 @@ getJasmineRequireObj().QueueRunner = function(j$) {
     this.errored_ = false;
 
     if (typeof this.onComplete !== 'function') {
-      throw new Error('invalid onComplete ' + JSON.stringify(this.onComplete));
+      throw new Error('invalid onComplete ' + this.onComplete);
     }
     this.deprecated = attrs.deprecated;
   }
@@ -7538,7 +7567,10 @@ getJasmineRequireObj().QueueRunner = function(j$) {
   };
 
   QueueRunner.prototype.setTimeout = function(fn, timeout) {
-    return Function.prototype.apply.apply(this.timeout.setTimeout, [
+    // TODO: GRAALVM: Had to change the `Function.prototype.apply.apply` to `Function.prototype.apply`
+    //                This is an old problem with IE
+    //                https://stackoverflow.com/questions/37609515/function-prototype-apply-apply-why-call-it-twice
+    return Function.prototype.apply(this.timeout.setTimeout, [
       j$.getGlobal(),
       [fn, timeout]
     ]);
@@ -7612,8 +7644,9 @@ getJasmineRequireObj().QueueRunner = function(j$) {
 
     if (queueableFn.timeout !== undefined) {
       const timeoutInterval =
-        queueableFn.timeout || j$.DEFAULT_TIMEOUT_INTERVAL;
-      timeoutId = this.setTimeout(function() {
+          queueableFn.timeout || j$.DEFAULT_TIMEOUT_INTERVAL;
+
+      timeoutId = this.setTimeout( function() {
         timedOut = true;
         const error = new Error(
           'Timeout - Async function did not complete within ' +
@@ -7652,6 +7685,8 @@ getJasmineRequireObj().QueueRunner = function(j$) {
         return { completedSynchronously: false };
       }
     } catch (e) {
+      // TODO: GRAALVM: Adding `console.log` for extra debugging
+      console.log(e);
       onException(e);
       this.recordError_(iterativeIndex);
     }
@@ -7780,7 +7815,8 @@ getJasmineRequireObj().ReportDispatcher = function(j$) {
         addFn(fns, reporter, method, args);
       }
 
-      return new Promise(function(resolve) {
+      // TODO: GRAALVM: Added Arrow Function so 'fns' is accessed
+      return new Promise((resolve) => {
         queueRunnerFactory({
           queueableFns: fns,
           onComplete: resolve,
@@ -8441,7 +8477,7 @@ getJasmineRequireObj().Runner = function(j$) {
     // Although execute returns a promise, it isn't async for backwards
     // compatibility: The "Invalid order" exception needs to be propagated
     // synchronously from Env#execute.
-    // TODO: make this and Env#execute async in the next major release
+    // TODO: JASMINE: make this and Env#execute async in the next major release
     execute(runablesToRun) {
       if (this.executedBefore_) {
         this.topSuite_.reset();
@@ -8465,7 +8501,7 @@ getJasmineRequireObj().Runner = function(j$) {
         seed: j$.isNumber_(config.seed) ? config.seed + '' : config.seed
       });
 
-      const processor = new j$.TreeProcessor({
+      const processor = new j$.TreeProcessor( {
         tree: this.topSuite_,
         runnableIds: runablesToRun,
         queueRunnerFactory: options => {
@@ -8542,16 +8578,26 @@ getJasmineRequireObj().Runner = function(j$) {
        * @property {Order} order - Information about the ordering (random or not) of this execution of the suite.
        * @since 2.0.0
        */
+      // TODO: GRAALVM: Added then() and catch() to ensure Jasmine Started succeeded.
       await this.reporter_.jasmineStarted({
         totalSpecsDefined,
         order: order
-      });
+      }).
+      then(function(value) {console.log("Jasmine Started");}).
+      catch(function(reason) {throw new Error("Runner.Reporter did not start: " + reason);});
 
       this.currentlyExecutingSuites_.push(this.topSuite_);
-      await processor.execute();
+
+      // TODO: GRAALVM: Added then() and catch() to ensure Processor Executed successfully
+      await processor.execute().
+      then(function(value) {console.log("Runner.Processor executed successfully");}).
+      catch(function(reason) {throw new Error("Runner.Processor executed unsuccessfully: " + reason)});
 
       if (this.topSuite_.hadBeforeAllFailure) {
-        await this.reportChildrenOfBeforeAllFailure_(this.topSuite_);
+        // TODO: GRAALVM: Added then() and catch() to ensure Reporting of Children Before all Failure Executed successfully.
+        await this.reportChildrenOfBeforeAllFailure_(this.topSuite_).
+        then(function(value) {console.log("Report of Children Before All Failure Success");}).
+        catch(function(reason) {throw new Error("Report of Children Before All Failure Failed: " + reason);});
       }
 
       this.runableResources_.clearForRunable(this.topSuite_.id);
@@ -8593,7 +8639,11 @@ getJasmineRequireObj().Runner = function(j$) {
         deprecationWarnings: this.topSuite_.result.deprecationWarnings
       };
       this.topSuite_.reportedDone = true;
-      await this.reporter_.jasmineDone(jasmineDoneInfo);
+
+      // TODO: GRAALVM: Added then() and catch() to ensure Jasmine is done.
+      await this.reporter_.jasmineDone(jasmineDoneInfo).
+      then(function(value) {console.log("Jasmine Done Success: " + value);}).
+      catch(function(reason) {console.log("Jasmine Done Rejected: " + reason);});
       return jasmineDoneInfo;
     }
 
@@ -8605,17 +8655,30 @@ getJasmineRequireObj().Runner = function(j$) {
     async reportChildrenOfBeforeAllFailure_(suite) {
       for (const child of suite.children) {
         if (child instanceof j$.Suite) {
-          await this.reporter_.suiteStarted(child.result);
-          await this.reportChildrenOfBeforeAllFailure_(child);
+          // TODO: GRAALVM: Added then() and catch() to ensure Suite Started.
+          await this.reporter_.suiteStarted(child.result).
+          then(function(value) {console.log("Runner - Reporter - Suite Started Success: " + value);}).
+          catch(function(reason) {console.log("Runner - Reporter - Suite Started Rejected: " + reason);});
+
+          // TODO: GRAALVM: Added then() and catch() to ensure Reporting of Children Before all Failure Executed successfully.
+          await this.reportChildrenOfBeforeAllFailure_(child).
+          then(function(value) {console.log("Runner - Reporter - reportChildrenOfBeforeAllFailure_ Success");}).
+          catch(function(reason) {console.log("Runner - Reporter - reportChildrenOfBeforeAllFailure_ Rejected: " + reason);});
 
           // Marking the suite passed is consistent with how suites that
           // contain failed specs but no suite-level failures are reported.
           child.result.status = 'passed';
 
-          await this.reporter_.suiteDone(child.result);
+          // TODO: GRAALVM: Added then() and catch() to ensure Suite is done.
+          await this.reporter_.suiteDone(child.result).
+          then(function(value) {console.log("Runner - Reporter - Suite Done Success: " + value);}).
+          catch(function(reason) {console.log("Runner - Reporter - Suite Done Rejected: " + reason);});
         } else {
+          // TODO: GRAALVM: Added then() and catch() to ensure Spec Started.
           /* a spec */
-          await this.reporter_.specStarted(child.result);
+          await this.reporter_.specStarted(child.result).
+          then(function(value) {console.log("Runner - Reporter - Spec Started Success: " + value);}).
+          catch(function(reason) {console.log("Runner - Reporter - Spec Started Rejected: " + reason);});
 
           child.addExpectationResult(
             false,
@@ -8630,7 +8693,7 @@ getJasmineRequireObj().Runner = function(j$) {
           );
           child.result.status = 'failed';
 
-          await new Promise(resolve => {
+          await new Promise((resolve) => {
             this.reportSpecDone_(child, child.result, resolve);
           });
         }
@@ -8949,7 +9012,8 @@ getJasmineRequireObj().SpyFactory = function(j$) {
       }
 
       if (methods.length === 0 && properties.length === 0) {
-        throw 'createSpyObj requires a non-empty array or object of method names to create spies for';
+        // TODO: GRAALVM: Wrapped message in object
+        throw new Error('createSpyObj requires a non-empty array or object of method names to create spies for');
       }
 
       return obj;
@@ -9430,32 +9494,35 @@ getJasmineRequireObj().StackTrace = function(j$) {
     this.style = parseResult.style;
   }
 
-  const framePatterns = [
-    // Node, Chrome, Edge
-    // e.g. "   at QueueRunner.run (http://localhost:8888/__jasmine__/jasmine.js:4320:20)"
-    // Note that the "function name" can include a surprisingly large set of
-    // characters, including angle brackets and square brackets.
-    {
-      re: /^\s*at ([^\)]+) \(([^\)]+)\)$/,
-      fnIx: 1,
-      fileLineColIx: 2,
-      style: 'v8'
-    },
+  const framePatterns = [];
 
-    // NodeJS alternate form, often mixed in with the Chrome style
-    // e.g. "  at /some/path:4320:20
-    { re: /\s*at (.+)$/, fileLineColIx: 1, style: 'v8' },
-
-    // PhantomJS on OS X, Safari, Firefox
-    // e.g. "run@http://localhost:8888/__jasmine__/jasmine.js:4320:27"
-    // or "http://localhost:8888/__jasmine__/jasmine.js:4320:27"
-    {
-      re: /^(?:(([^@\s]+)@)|@)?([^\s]+)$/,
-      fnIx: 2,
-      fileLineColIx: 3,
-      style: 'webkit'
-    }
-  ];
+  // TODO: GRAALVM: Removing Browser and Node JS reference
+  // const framePatterns = [
+  //   // Node, Chrome, Edge
+  //   // e.g. "   at QueueRunner.run (http://localhost:8888/__jasmine__/jasmine.js:4320:20)"
+  //   // Note that the "function name" can include a surprisingly large set of
+  //   // characters, including angle brackets and square brackets.
+  //   {
+  //     re: /^\s*at ([^\)]+) \(([^\)]+)\)$/,
+  //     fnIx: 1,
+  //     fileLineColIx: 2,
+  //     style: 'v8'
+  //   },
+  //
+  //   // NodeJS alternate form, often mixed in with the Chrome style
+  //   // e.g. "  at /some/path:4320:20
+  //   { re: /\s*at (.+)$/, fileLineColIx: 1, style: 'v8' },
+  //
+  //   // PhantomJS on OS X, Safari, Firefox
+  //   // e.g. "run@http://localhost:8888/__jasmine__/jasmine.js:4320:27"
+  //   // or "http://localhost:8888/__jasmine__/jasmine.js:4320:27"
+  //   {
+  //     re: /^(?:(([^@\s]+)@)|@)?([^\s]+)$/,
+  //     fnIx: 2,
+  //     fileLineColIx: 3,
+  //     style: 'webkit'
+  //   }
+  // ];
 
   // regexes should capture the function name (if any) as group 1
   // and the file, line, and column as group 2.
@@ -9769,7 +9836,7 @@ getJasmineRequireObj().Suite = function(j$) {
       } else {
         this.result.failedExpectations.push(expectationResult);
 
-        // TODO: refactor so that we don't need to override cached status
+        // TODO: JASMINE: refactor so that we don't need to override cached status
         if (this.result.status) {
           this.result.status = 'failed';
         }
@@ -10238,22 +10305,23 @@ getJasmineRequireObj().TreeProcessor = function() {
       }
 
       if (!stats.valid) {
-        throw 'invalid order';
+        // TODO: GRAALVM: Changed Error Message
+        throw new Error('Execution Tree is invalid');
       }
 
       const childFns = wrapChildren(tree, 0);
 
-      await new Promise(function(resolve) {
+      await new Promise((resolve) => {
         queueRunnerFactory({
           queueableFns: childFns,
           userContext: tree.sharedUserContext(),
-          onException: function() {
+          onException: function () {
             tree.handleException.apply(tree, arguments);
           },
           onComplete: resolve,
           onMultipleDone: tree.onMultipleDone
-            ? tree.onMultipleDone.bind(tree)
-            : null
+              ? tree.onMultipleDone.bind(tree)
+              : null
         });
       });
     };

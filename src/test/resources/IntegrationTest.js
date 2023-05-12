@@ -7,13 +7,13 @@ describe("Integration Test Describe", function () {
     });
 
     beforeEach(function () {
-        console.log("##### Before All");
+        console.log("##### Before Each");
     });
 
     it("Integration Test Spec", function () {
         console.log("Starting Integration Test Spec");
 
-        expect(true).toBe(true);
+        expect(true).toBe(false);
 
         console.log("Finished Integration Test Spec");
     });
